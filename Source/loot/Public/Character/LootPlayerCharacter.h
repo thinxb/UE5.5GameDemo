@@ -40,7 +40,9 @@ public:
 	float WalkSpeed = 300.f;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Movement|Speed")
-	float SprintSpeed = 600.f;
+	float SprintSpeed = 700.f;
+	
+	float aa =1;
 	
 	// === 触发模式（后续会移到 GameInstance，这里先简单放这）===
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category = "Movement|Settings")
