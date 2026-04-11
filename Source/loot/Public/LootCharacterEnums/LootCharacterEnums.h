@@ -10,12 +10,29 @@ enum class EGaitState : uint8
 	Sprint  UMETA(DisplayName = "冲刺")
 };
 
-// 未来可增加更多状态枚举
 UENUM(BlueprintType)
 enum class EMovementAction : uint8
 {
+	Idle    UMETA(DisplayName = "站立"),
 	Crouch   UMETA(DisplayName = "蹲下"),
-	Prone    UMETA(DisplayName = "匍匐")
-	
-	
+};
+
+UENUM(BlueprintType)
+enum class EWeaponType : uint8
+{
+	None,
+	// 枪械
+	Pistol,
+	Rifle,
+	Shotgun,
+	SMG,
+	Sniper,
+
+	// 近战
+	Knife,
+	Bat,
+
+	// 投掷
+	Grenade,
+	Flashbang,
 };

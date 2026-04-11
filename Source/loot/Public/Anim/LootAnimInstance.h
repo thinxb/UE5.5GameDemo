@@ -20,7 +20,13 @@ public:
 	
 protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Character")
-	float Speed;//速度
+	float MoveSpeed;//速度
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Character")
+	float Right;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Character")
+	float UP;
 	
 	UPROPERTY(BlueprintReadOnly, Category = "Character")
 	EGaitState GaitState = EGaitState::Walk;//状态记录

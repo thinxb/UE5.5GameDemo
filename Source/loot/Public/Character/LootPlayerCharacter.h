@@ -42,8 +42,13 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Movement|Speed")
 	float SprintSpeed = 700.f;
 	
-	float aa =1;
-	
+	//鼠标移动
+	UPROPERTY(BlueprintReadOnly, Category = "MouseInput")
+	float MouseRight = 0.f;
+
+	UPROPERTY(BlueprintReadOnly, Category = "MouseInput")
+	float MouseUp = 0.f;
+	 
 	// === 触发模式（后续会移到 GameInstance，这里先简单放这）===
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category = "Movement|Settings")
 	bool bSneakIsToggle = true;//静步 false按住 true切换

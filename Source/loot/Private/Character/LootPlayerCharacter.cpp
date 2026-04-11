@@ -152,6 +152,11 @@ void ALootPlayerCharacter::Input_Look(const FInputActionValue& Value)
 {
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
 
+	//存原始鼠标数据
+	MouseRight = LookAxisVector.X;
+	MouseUp = LookAxisVector.Y;
+	GEngine->AddOnScreenDebugMessage(-1,2,FColor::Cyan,FString::Printf(TEXT("Right %f"),MouseRight));
+	GEngine->AddOnScreenDebugMessage(-1,2,FColor::Cyan,FString::Printf(TEXT("UP %f"),MouseUp));
 	if (Controller != nullptr)
 	{
 		//添加旋转量

@@ -13,10 +13,13 @@ void ULootAnimInstance::NativeUpdateAnimation(float DeltaTime)
 		lootCharacter = Cast<ALootPlayerCharacter>(TryGetPawnOwner());
 		if (!lootCharacter)
 		{
-			Speed = 0.f;
+			MoveSpeed = 0.f;
 			GaitState = EGaitState::Walk;
 			return;
 		}
+		
+		Right = lootCharacter->MouseRight;
+		UP = lootCharacter->MouseUp;
 	}
 	
 
@@ -25,7 +28,7 @@ void ULootAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	{
 		FVector Velocity = Movecomt->Velocity;
 		Velocity.Z = 0.f;//忽略垂直速度
-		Speed = Velocity.Size();
+		MoveSpeed = Velocity.Size();
 		GaitState = lootCharacter->GetGaitState();//更新状态
 		// 状态名称  调试
 		FString StateName;
@@ -43,6 +46,6 @@ void ULootAnimInstance::NativeUpdateAnimation(float DeltaTime)
 			break;
 		}
 		GEngine->AddOnScreenDebugMessage(-1,2.f,FColor::Green,FString::Printf(TEXT("状态: %s"),*StateName));
-		GEngine->AddOnScreenDebugMessage(-1,2.f,FColor::Green,FString::Printf(TEXT("速度: %f"),Speed));
+		GEngine->AddOnScreenDebugMessage(-1,2.f,FColor::Green,FString::Printf(TEXT("速度: %f"),MoveSpeed));
 	}
 }
