@@ -28,9 +28,13 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	
 public:	
-	// 当前状态变量
+	// 当前移动状态变量
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Movement|State")
-	EGaitState CurrentGaitState  = EGaitState::Walk;
+	EMovementState CurrentMovementState  = EMovementState::Walk;
+	
+	//当前角色姿态
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Stance|State")
+	EStance CurrentStance  = EStance::Idle;
 	
 	//速度配置
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category = "Movement|Speed")
@@ -56,13 +60,25 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Movement|Settings")
 	bool bSprintIsToggle = false;//奔跑 false按住 true切换
 	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Movement|Settings")
+	bool bCrouchToggle = true;//蹲下 false按住 true切换
+	
 	//设置切换移动状态
 	UFUNCTION(BlueprintCallable,Category = "Movement")
-	void SetGaitState(EGaitState NewGait);
+	void SetMovementState(EMovementState NewGait);
 	
 	//获取移动状态
 	UFUNCTION(BlueprintCallable, Category = "Movement")
-	EGaitState GetGaitState() const { return CurrentGaitState; }
+	EMovementState GetMovementState() const { return CurrentMovementState; }
+	
+	//设置角色姿态
+	UFUNCTION(BlueprintCallable,Category = "Movement")
+	void SetStance(EStance NewStance);
+	
+	//获取角色姿态
+	UFUNCTION(BlueprintCallable,Category = "Stance")
+	EStance GetStance() const { return CurrentStance;};
+	
 	
 	/** 返回摄像机伸缩臂子对象 **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
@@ -108,6 +124,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* SprintAction;
 	
+	//蹲下输入动作
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* CrouchAction;
 
 	
 protected:
@@ -125,6 +144,9 @@ protected:
 	void Input_Sprint_Started(const FInputActionValue& Value);
 	void Input_Sprint_Completed(const FInputActionValue& Value);
 	
+	//蹲下
+	void Input_Crouch_Started(const FInputActionValue& Value);
+	void Input_Crouch_Completed(const FInputActionValue& Value);
 
 	
 	virtual void NotifyControllerChanged() override;//增强输入
@@ -136,6 +158,6 @@ private:
 	// 状态追踪
 	bool bSneakActive = false;
 	bool bSprintActive = false;
-	
+	bool bCrouchActive = false;
 	
 };

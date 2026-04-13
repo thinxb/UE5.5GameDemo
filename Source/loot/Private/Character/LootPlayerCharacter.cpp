@@ -114,6 +114,12 @@ void ALootPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 			EnhancedInputComponent->BindAction(SprintAction,ETriggerEvent::Completed,this,&ALootPlayerCharacter::Input_Sprint_Completed);
 		}
 		
+		//Crouch
+		if (CrouchAction)
+		{
+			EnhancedInputComponent->BindAction(CrouchAction,ETriggerEvent::Started,this,&ALootPlayerCharacter::Input_Crouch_Started);
+			EnhancedInputComponent->BindAction(CrouchAction,ETriggerEvent::Completed,this,&ALootPlayerCharacter::Input_Crouch_Completed);
+		}
 	}
 	else
 	{
@@ -155,8 +161,8 @@ void ALootPlayerCharacter::Input_Look(const FInputActionValue& Value)
 	//存原始鼠标数据
 	MouseRight = LookAxisVector.X;
 	MouseUp = LookAxisVector.Y;
-	GEngine->AddOnScreenDebugMessage(-1,2,FColor::Cyan,FString::Printf(TEXT("Right %f"),MouseRight));
-	GEngine->AddOnScreenDebugMessage(-1,2,FColor::Cyan,FString::Printf(TEXT("UP %f"),MouseUp));
+	// GEngine->AddOnScreenDebugMessage(-1,2,FColor::Cyan,FString::Printf(TEXT("Right %f"),MouseRight));
+	// GEngine->AddOnScreenDebugMessage(-1,2,FColor::Cyan,FString::Printf(TEXT("UP %f"),MouseUp));
 	if (Controller != nullptr)
 	{
 		//添加旋转量
@@ -171,7 +177,7 @@ void ALootPlayerCharacter::Input_Sneak_Started(const FInputActionValue& Value)
 	{
 		//切换模式
 		bSneakActive = !bSneakActive;
-		SetGaitState(bSneakActive ? EGaitState::Sneak : EGaitState::Walk);//静步与行走来回切换
+		SetMovementState(bSneakActive ? EMovementState::Sneak : EMovementState::Walk);//静步与行走来回切换
 		if (bSprintActive)
 		{
 			bSprintActive = false;
@@ -181,7 +187,7 @@ void ALootPlayerCharacter::Input_Sneak_Started(const FInputActionValue& Value)
 	{
 		//按住模式
 		bSneakActive = true;
-		SetGaitState(EGaitState::Sneak);
+		SetMovementState(EMovementState::Sneak);
 
 	}
 }
@@ -192,7 +198,7 @@ void ALootPlayerCharacter::Input_Sneak_Completed(const FInputActionValue& Value)
 	if (!bSneakIsToggle)
 	{
 		bSneakActive = false;
-		SetGaitState(EGaitState::Walk);
+		SetMovementState(EMovementState::Walk);
 		if (bSprintActive)
 		{
 			bSprintActive = false;
@@ -206,7 +212,7 @@ void ALootPlayerCharacter::Input_Sprint_Started(const FInputActionValue& Value)
 	{
 		//切换模式
 		bSprintActive = !bSprintActive;
-		SetGaitState(bSprintActive ? EGaitState::Sprint : EGaitState::Walk);//冲刺与行走来回切换
+		SetMovementState(bSprintActive ? EMovementState::Sprint : EMovementState::Walk);//冲刺与行走来回切换
 		if (bSneakActive)
 		{
 			bSneakActive = false;
@@ -216,7 +222,7 @@ void ALootPlayerCharacter::Input_Sprint_Started(const FInputActionValue& Value)
 	{
 		//按住模式
 		bSprintActive = true;
-		SetGaitState(EGaitState::Sprint);
+		SetMovementState(EMovementState::Sprint);
 
 	}
 }
@@ -226,36 +232,83 @@ void ALootPlayerCharacter::Input_Sprint_Completed(const FInputActionValue& Value
 	if (!bSprintIsToggle)
 	{
 		bSprintActive = false;
-		SetGaitState(EGaitState::Walk);
+		SetMovementState(EMovementState::Walk);
 		if (bSneakActive)//重置其他状态
 		{
 			bSneakActive = false;
 		}
 	}
 }
-void ALootPlayerCharacter::SetGaitState(EGaitState NewGait)
+
+void ALootPlayerCharacter::Input_Crouch_Started(const FInputActionValue& Value)
 {
-	if (CurrentGaitState  == NewGait) return;;
+	if (bCrouchToggle)
+	{
+		//切换模式
+		bCrouchActive = !bCrouchActive;
+		SetStance(bCrouchActive ? EStance::Crouch : EStance::Idle);//冲刺与行走来回切换
+	}
+	else
+	{
+		//按住模式
+		bCrouchActive = true;
+		SetStance(EStance::Crouch);
+
+	}
 	
-	CurrentGaitState = NewGait;
+}
+
+void ALootPlayerCharacter::Input_Crouch_Completed(const FInputActionValue& Value)
+{
+	if (!bCrouchToggle)
+	{
+		bCrouchActive = false;
+		SetStance(EStance::Idle);
+	}
+}
+
+void ALootPlayerCharacter::SetMovementState(EMovementState NewGait)
+{
+	if (CurrentMovementState  == NewGait) return;;
+	
+	CurrentMovementState = NewGait;
 	
 	float TargetSpeed = WalkSpeed;
 
 	// 状态名称  调试
 	FString StateName;
 	
-	switch (CurrentGaitState) {
-	case EGaitState::Sneak: TargetSpeed = SneakSpeed;
+	switch (CurrentMovementState) {
+	case EMovementState::Sneak: TargetSpeed = SneakSpeed;
 		StateName = TEXT("静步");
 		break;
-	case EGaitState::Walk:TargetSpeed = WalkSpeed;
+	case EMovementState::Walk:TargetSpeed = WalkSpeed;
 		StateName = TEXT("步行");
 		break;
-	case EGaitState::Sprint:TargetSpeed = SprintSpeed;
+	case EMovementState::Sprint:TargetSpeed = SprintSpeed;
 		StateName = TEXT("冲刺");
 		break;
 	}
 	GetCharacterMovement()->MaxWalkSpeed = TargetSpeed;
 	//GEngine->AddOnScreenDebugMessage(-1,2.f,FColor::Green,FString::Printf(TEXT("状态: %s"),*StateName));
 	//GEngine->AddOnScreenDebugMessage(-1,2.f,FColor::Cyan,FString::Printf(TEXT("速度: %f"),TargetSpeed));
+}
+
+void ALootPlayerCharacter::SetStance(EStance NewStance)
+{
+	if (CurrentStance  == NewStance) return;;
+	CurrentStance = NewStance;
+	// float TargetSpeed = WalkSpeed;
+	//
+	 // 状态名称  调试
+	 FString StateName;
+	 switch (CurrentStance) {
+	 case EStance::Idle: 
+	 	StateName = TEXT("站立");
+	 	break;
+	 case EStance::Crouch:;
+	 	StateName = TEXT("蹲下");
+	 	break;
+	 }
+	GEngine->AddOnScreenDebugMessage(-1,2.f,FColor::Green,FString::Printf(TEXT("状态: %s"),*StateName));
 }

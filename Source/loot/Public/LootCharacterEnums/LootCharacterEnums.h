@@ -3,7 +3,7 @@
 #include "LootCharacterEnums.generated.h"
 
 UENUM(BlueprintType)
-enum class EGaitState : uint8
+enum class EMovementState : uint8
 {
 	Sneak   UMETA(DisplayName = "静步"),
 	Walk    UMETA(DisplayName = "步行"),
@@ -11,7 +11,7 @@ enum class EGaitState : uint8
 };
 
 UENUM(BlueprintType)
-enum class EMovementAction : uint8
+enum class EStance : uint8
 {
 	Idle    UMETA(DisplayName = "站立"),
 	Crouch   UMETA(DisplayName = "蹲下"),
